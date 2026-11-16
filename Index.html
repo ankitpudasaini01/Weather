@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiMausam — Village & Farmer Weather</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 50%, #fffde7 100%);
+            color: #1b2e1e;
+            min-height: 100vh;
+            padding: 14px 12px 40px;
+        }
+
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 14px 18px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(27, 94, 32, 0.08);
+            border: 1px solid #c8e6c9;
+        }
+
+        .title-box h1 {
+            font-size: 1.2rem;
+            color: #1b5e20;
+            font-weight: 800;
+        }
+
+        .title-box p {
+            font-size: 0.8rem;
+            color: #4e6e52;
+        }
+
+        .unit-switch {
+            display: flex;
+            background: #e8f5e9;
+            padding: 3px;
+            border-radius: 10px;
+        }
+
+        .unit-switch button {
+            border: none;
+            background: transparent;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #2e7d32;
+            cursor: pointer;
+        }
+
+        .unit-switch button.active {
+            background: #2e7d32;
+            color: #ffffff;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 18px;
+            border-radius: 18px;
+            box-shadow: 0 6px 20px rgba(27, 94, 32, 0.08);
+            border: 1px solid #dcedc8;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar input {
+            flex: 1;
+            min-width: 180px;
+            padding: 12px 14px;
+            border: 2px solid #c8e6c9;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .search-bar input:focus {
+            border-color: #2e7d32;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .btn-green {
+            background: #2e7d32;
+            color: #ffffff;
+        }
+
+        .btn-light {
+            background: #e8f5e9;
+            color: #1b5e20;
+            border: 1px solid #a5d6a7;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #556b2f;
+        }
+
+        .chip {
+            background: #f1f8e9;
+            border: 1px solid #c5e1a5;
+            padding: 5px 11px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #2e7d32;
+            cursor: pointer;
+        }
+
+        .status-msg {
+            margin-top: 8px;
+            font-size: 0.82rem;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .weather-hero {
+            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 60%, #388e3c 100%);
+            color: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .loc-tag {
+            background: rgba(255, 255, 255, 0.18);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .temp-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .big-temp {
+            font-size: 3.4rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .cond-box {
+            text-align: right;
+        }
+
+        .cond-icon {
+            font-size: 2.8rem;
+            display: block;
+        }
+
+        .cond-text {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #c8e6c9;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .stat span {
+            display: block;
+            font-size: 0.75rem;
+            color: #c8e6c9;
+        }
+
+        .stat strong {
+            font-size: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #1b5e20;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: #c8e6c9;
+            color: #1b5e20;
+        }
+
+        .guide-item {
+            background: #f9fbe7;
+            border-left: 4px solid #558b2f;
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .guide-item h3 {
+            font-size: 0.88rem;
+            color: #1b2e1e;
+            margin-bottom: 2px;
+        }
+
+        .guide-item p {
+            font-size: 0.82rem;
+            color: #4e6e52;
+            line-height: 1.4;
+        }
+
+        .forecast-list {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .forecast-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .f-day {
+            background: #f1f8e9;
+            border: 1px solid #dcedc8;
+            border-radius: 12px;
+            padding: 10px 6px;
+            text-align: center;
+        }
+
+        .f-day strong {
+            display: block;
+            font-size: 0.82rem;
+            color: #33691e;
+        }
+
+        .f-icon {
+            font-size: 1.6rem;
+            margin: 6px 0;
+        }
+
+        .f-temp {
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        .f-rain {
+            font-size: 0.74rem;
+            color: #0277bd;
+            margin-top: 3px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #1b5e20;
+        }
+
+        .field input, .field select, .field textarea {
+            padding: 10px 12px;
+            border: 1.5px solid #c8e6c9;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            outline: none;
+            background: #ffffff;
+        }
+
+        .btn-row {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .note-box {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: #e8f5e9;
+            color: #1b5e20;
+            font-size: 0.82rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="title-box">
+            <h1>🌾 KrishiMausam Live</h1>
+            <p>Village &amp; Farm Weather Forecast</p>
+        </div>
+        <div class="unit-switch">
+            <button id="btnC" class="active" onclick="changeUnit('C')">°C</button>
+            <button id="btnF" onclick="changeUnit('F')">°F</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Enter village or city (e.g., Rupakot, Chitwan)...">
+            <button class="btn btn-green" onclick="findCity()">Search</button>
+            <button class="btn btn-light" onclick="getGPS()">📍 Field GPS</button>
+        </div>
+        <div class="chips">
+            <span>Villages:</span>
+            <button class="chip" onclick="selectPreset('Rupakot, Nepal', 28.2096, 84.0833)">Rupakot</button>
+            <button class="chip" onclick="selectPreset('Chitwan, Nepal', 27.6833, 84.4333)">Chitwan</button>
+            <button class="chip" onclick="selectPreset('Itahari, Nepal', 26.6646, 87.2718)">Itahari</button>
+            <button class="chip" onclick="selectPreset('Jumla, Nepal', 29.2747, 82.1838)">Jumla</button>
+            <button class="chip" onclick="selectPreset('Kathmandu, Nepal', 27.7172, 85.3240)">Kathmandu</button>
+        </div>
+        <div class="status-msg" id="statusMsg">Ready — Showing local farm forecast</div>
+    </div>
+
+    <div class="weather-hero">
+        <div class="loc-tag" id="locDisplay">📍 Rupakot, Nepal</div>
+        <div class="temp-row">
+            <div class="big-temp" id="tempDisplay">18°C</div>
+            <div class="cond-box">
+                <span class="cond-icon" id="iconDisplay">⛅</span>
+                <span class="cond-text" id="descDisplay">Partly Cloudy</span>
+            </div>
+        </div>
+        <div class="stats-row">
+            <div class="stat">
+                <span>💧 Humidity</span>
+                <strong id="humDisplay">65%</strong>
+            </div>
+            <div class="stat">
+                <span>💨 Wind</span>
+                <strong id="windDisplay">10 km/h</strong>
+            </div>
+            <div class="stat">
+                <span>🌧️ Rain Chance</span>
+                <strong id="rainDisplay">15%</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">
+            <span>🚜 Farmer Field Advisory</span>
+            <span class="badge" id="farmStatus">Good for Fieldwork</span>
+        </div>
+        <div class="guide-item">
+            <h3>🌱 Irrigation &amp; Watering</h3>
+            <p id="tipWater">Moderate humidity. Normal morning watering is recommended.</p>
+        </div>
+        <div class="guide-item">
+            <h3>🧪 Spraying &amp; Fertilizer</h3>
+            <p id="tipSpray">Calm wind today — safe for foliar spray without drift.</p>
+        </div>
+        <div class="guide-item">
+            <h3>🌾 Harvesting &amp; Storage</h3>
+            <p id="tipHarvest">Good dry conditions for fieldwork and grain drying.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-title"><span>📅 5-Day Crop Forecast</span></div>
+        <div class="forecast-list" id="forecastBox"></div>
+    </div>
+
+    <div class="card">
+        <div class="section-title"><span>📩 Send Farmer Weather Report to Admin</span></div>
+        <div class="form-grid">
+            <div class="field">
+                <label>Farmer / User Name *</label>
+                <input type="text" id="fName" placeholder="Enter your name">
+            </div>
+            <div class="field">
+                <label>Phone Number *</label>
+                <input type="tel" id="fPhone" placeholder="+977 98XXXXXXXX">
+            </div>
+            <div class="field">
+                <label>Village / Ward *</label>
+                <input type="text" id="fVillage" value="Rupakot, Nepal">
+            </div>
+            <div class="field">
+                <label>Crop Type</label>
+                <select id="fCrop">
+                    <option>Rice / Paddy (धान)</option>
+                    <option>Maize / Corn (मकै)</option>
+                    <option>Wheat / Millet (गहुँ / कोदो)</option>
+                    <option>Vegetables (तरकारी)</option>
+                    <option>Livestock (पशुपालन)</option>
+                </select>
+            </div>
+            <div class="field full">
+                <label>Field Message / Command *</label>
+                <textarea id="fMsg" rows="3" placeholder="Write your local weather report or crop weather request..."></textarea>
+            </div>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-green" onclick="sendEmailNow()">📱 Send Directly via Phone Email</button>
+            <button class="btn btn-light" onclick="copyReportText()">📋 Copy Report Data</button>
+        </div>
+        <div class="note-box" id="formNote"></div>
+    </div>
+</div>
+
+<script>
+    const ADMIN_EMAIL = "ankitpudasaini01@gmail.com";
+
+    let unit = "C";
+    let state = {
+        location: "Rupakot, Nepal",
+        tempC: 18,
+        humidity: 65,
+        wind: 10,
+        rain: 15,
+        code: 2,
+        days: [
+            { name: "Today", code: 2, max: 19, min: 11, rain: 15 },
+            { name: "Tue", code: 1, max: 21, min: 12, rain: 10 },
+            { name: "Wed", code: 61, max: 17, min: 10, rain: 70 },
+            { name: "Thu", code: 3, max: 18, min: 11, rain: 25 },
+            { name: "Fri", code: 0, max: 22, min: 13, rain: 5 }
+        ]
+    };
+
+    function getIconAndText(code) {
+        if (code === 0) return { icon: "☀️", text: "Clear Sky" };
+        if (code === 1 || code === 2) return { icon: "⛅", text: "Partly Cloudy" };
+        if (code === 3) return { icon: "☁️", text: "Cloudy" };
+        if (code === 45 || code === 48) return { icon: "🌫️", text: "Foggy" };
+        if (code >= 51 && code <= 67) return { icon: "🌧️", text: "Rainy" };
+        if (code >= 80 && code <= 82) return { icon: "🌦️", text: "Rain Showers" };
+        if (code >= 95) return { icon: "⛈️", text: "Thunderstorm" };
+        return { icon: "🌤️", text: "Fair Weather" };
+    }
+
+    function fmtTemp(c) {
+        if (unit === "F") {
+            return Math.round((c * 9 / 5) + 32) + "°F";
+        }
+        return Math.round(c) + "°C";
+    }
+
+    function changeUnit(u) {
+        unit = u;
+        document.getElementById("btnC").className = u === "C" ? "active" : "";
+        document.getElementById("btnF").className = u === "F" ? "active" : "";
+        drawUI();
+    }
+
+    function drawUI() {
+        const info = getIconAndText(state.code);
+        document.getElementById("locDisplay").textContent = "📍 " + state.location;
+        document.getElementById("tempDisplay").textContent = fmtTemp(state.tempC);
+        document.getElementById("iconDisplay").textContent = info.icon;
+        document.getElementById("descDisplay").textContent = info.text;
+        document.getElementById("humDisplay").textContent = state.humidity + "%";
+        document.getElementById("windDisplay").textContent = Math.round(state.wind) + " km/h";
+        document.getElementById("rainDisplay").textContent = state.rain + "%";
+        document.getElementById("fVillage").value = state.location;
+
+        const badge = document.getElementById("farmStatus");
+        const wTip = document.getElementById("tipWater");
+        const sTip = document.getElementById("tipSpray");
+        const hTip = document.getElementById("tipHarvest");
+
+        if (state.rain >= 60) {
+            badge.textContent = "⚠️ Rain Alert";
+            badge.style.background = "#ffcdd2";
+            badge.style.color = "#b71c1c";
+            wTip.textContent = "Rain expected soon. Pause field irrigation to save water.";
+            sTip.textContent = "Do not spray pesticides today; rain will wash them off.";
+            hTip.textContent = "Keep harvested crops covered and dry indoors.";
+        } else if (state.tempC >= 33) {
+            badge.textContent = "🔥 Heat Alert";
+            badge.style.background = "#ffe082";
+            badge.style.color = "#e65100";
+            wTip.textContent = "High heat. Water crops early morning or evening.";
+            sTip.textContent = "Avoid midday chemical spraying to prevent leaf burn.";
+            hTip.textContent = "Great sunny weather for drying grains and pulses.";
+        } else {
+            badge.textContent = "✅ Good for Fieldwork";
+            badge.style.background = "#c8e6c9";
+            badge.style.color = "#1b5e20";
+            wTip.textContent = "Balanced moisture. Ideal for routine watering and planting.";
+            sTip.textContent = "Low wind speed — safe for foliar fertilizer or pest spray.";
+            hTip.textContent = "Favorable weather for harvesting and soil preparation.";
+        }
+
+        const box = document.getElementById("forecastBox");
+        box.innerHTML = "";
+        for (let i = 0; i < state.days.length; i++) {
+            const d = state.days[i];
+            const dInfo = getIconAndText(d.code);
+            box.innerHTML +=
+                '<div class="f-day">' +
+                '<strong>' + d.name + '</strong>' +
+                '<div class="f-icon">' + dInfo.icon + '</div>' +
+                '<div class="f-temp">' + fmtTemp(d.max) + ' / ' + fmtTemp(d.min) + '</div>' +
+                '<div class="f-rain">💧 ' + d.rain + '%</div>' +
+                '</div>';
+        }
+    }
+
+    function loadWeather(lat, lon, label) {
+        const status = document.getElementById("statusMsg");
+        status.textContent = "Loading live weather for " + label + "...";
+
+        const url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat +
+            "&longitude=" + lon +
+            "&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m" +
+            "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
+            "&timezone=auto&forecast_days=5";
+
+        fetch(url)
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                const list = [];
+                for (let i = 0; i < data.daily.time.length; i++) {
+                    const dt = new Date(data.daily.time[i] + "T00:00:00");
+                    list.push({
+                        name: i === 0 ? "Today" : dayNames[dt.getDay()],
+                        code: data.daily.weather_code[i],
+                        max: data.daily.temperature_2m_max[i],
+                        min: data.daily.temperature_2m_min[i],
+                        rain: data.daily.precipitation_probability_max[i] || 0
+                    });
+                }
+
+                state.location = label;
+                state.tempC = data.current.temperature_2m;
+                state.humidity = data.current.relative_humidity_2m;
+                state.wind = data.current.wind_speed_10m;
+                state.code = data.current.weather_code;
+                state.rain = list[0] ? list[0].rain : 0;
+                state.days = list;
+
+                drawUI();
+                status.textContent = "✅ Live weather updated for " + label;
+            })
+            .catch(function() {
+                status.textContent = "⚠️ Offline mode: showing saved local forecast.";
+                drawUI();
+            });
+    }
+
+    function findCity() {
+        const q = document.getElementById("searchInput").value.trim();
+        if (!q) return;
+        const status = document.getElementById("statusMsg");
+        status.textContent = "Searching " + q + "...";
+
+        fetch("https://geocoding-api.open-meteo.com/v1/search?name=" + encodeURIComponent(q) + "&count=1&format=json")
+            .then(function(res) { return res.json(); })
+            .then(function(geo) {
+                if (!geo.results || geo.results.length === 0) {
+                    status.textContent = "❌ Location not found. Try a nearby district name.";
+                    return;
+                }
+                const place = geo.results[0];
+                const fullName = place.name + (place.country ? ", " + place.country : "");
+                loadWeather(place.latitude, place.longitude, fullName);
+            })
+            .catch(function() {
+                status.textContent = "⚠️ Check internet connection to search.";
+            });
+    }
+
+    function selectPreset(name, lat, lon) {
+        document.getElementById("searchInput").value = name;
+        loadWeather(lat, lon, name);
+    }
+
+    function getGPS() {
+        const status = document.getElementById("statusMsg");
+        if (!navigator.geolocation) {
+            status.textContent = "GPS not supported on this device.";
+            return;
+        }
+        status.textContent = "Getting field GPS location...";
+        navigator.geolocation.getCurrentPosition(
+            function(pos) {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                loadWeather(lat, lon, "My Field (" + lat.toFixed(2) + ", " + lon.toFixed(2) + ")");
+            },
+            function() {
+                status.textContent = "GPS permission blocked. Use village search above.";
+            }
+        );
+    }
+
+    function buildReportBody() {
+        const name = document.getElementById("fName").value.trim() || "Farmer";
+        const phone = document.getElementById("fPhone").value.trim() || "Not given";
+        const village = document.getElementById("fVillage").value.trim() || state.location;
+        const crop = document.getElementById("fCrop").value;
+        const msg = document.getElementById("fMsg").value.trim() || "Weather inquiry";
+        const info = getIconAndText(state.code);
+
+        return "Farmer Name: " + name + "\n" +
+            "Phone: " + phone + "\n" +
+            "Village: " + village + "\n" +
+            "Crop: " + crop + "\n" +
+            "Live Weather: " + fmtTemp(state.tempC) + " (" + info.text + ", Rain " + state.rain + "%)\n\n" +
+            "Message:\n" + msg;
+    }
+
+    function sendEmailNow() {
+        const subject = encodeURIComponent("KrishiMausam Farmer Report - " + state.location);
+        const body = encodeURIComponent(buildReportBody());
+        const note = document.getElementById("formNote");
+        note.style.display = "block";
+        note.textContent = "Opening your email app to send report to " + ADMIN_EMAIL + "...";
+        window.location.href = "mailto:" + ADMIN_EMAIL + "?subject=" + subject + "&body=" + body;
+    }
+
+    function copyReportText() {
+        const text = buildReportBody();
+        const note = document.getElementById("formNote");
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text);
+        }
+        note.style.display = "block";
+        note.textContent = "✅ Report copied! You can paste and send it via SMS, WhatsApp, or Email.";
+    }
+
+    drawUI();
+    loadWeather(28.2096, 84.0833, "Rupakot, Nepal");
+</script>
+
+</body>
+</html>
